@@ -19,7 +19,7 @@ app.use(express.json());
 
 // rutas de la aplicacion
 app.use('/api/v1/auth', v1AuthRouter);
-app.use('/api/v1/publicacion', v1PublicacionRouter);
+app.use('/api/v1/publicaciones', v1PublicacionRouter);
 
 // configuracion del puerto
 const PORT = process.env.PORT || 3000;
