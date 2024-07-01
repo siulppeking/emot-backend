@@ -4,8 +4,8 @@ const moment = require('../helpers/moment.helper');
 
 const obtenerPublicaciones = async (req, res) => {
     try {
-        const publicaciones = await Publicacion.find().populate('usuario');
-
+        const publicaciones = await Publicacion.find().populate('usuario').sort({ fechaCreacion: -1 });
+        
         const publicacionesResponse = publicaciones.map(publicacion => {
             return {
                 publicacionId: publicacion._id,
