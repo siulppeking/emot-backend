@@ -10,6 +10,15 @@ const crearPublicacion = [
     }
 ]
 
+const cambiarReaccion = [
+    check('publicacionId').isMongoId().withMessage('MongoID no es valido')
+        .notEmpty().withMessage('publicacionId'),
+    (req, res, next) => {
+        validateResult(req, res, next)
+    }
+]
+
 module.exports = {
-    crearPublicacion
+    crearPublicacion,
+    cambiarReaccion
 }
