@@ -1,27 +1,87 @@
 const Comentario = require("../models/comentario");
 const Publicacion = require("../models/publicacion");
+const moment = require('../helpers/moment.helper');
 
 const obtenerComentarios = async (req, res) => {
     try {
-        // obtiene los datos de la publicacion
         const { publicacionId } = req.params;
-
-        // busca la publicacion en la base de datos
         const publicacion = await Publicacion.findById(publicacionId);
 
-        if (!publicacion) return res.status(404).send({
-            respuesta: 'ERROR',
-            mensaje: 'La publicación ' + publicacionId + 'fue encontrada'
-        });
+        if (!publicacion) {
+            return res.status(404).send({
+                respuesta: 'ERROR',
+                mensaje: 'La publicación ' + publicacionId + 'fue encontrada'
+            });
+        }
 
         // obtiene todos los comentarios de la publicacion
-        const comentarios = await Comentario.find({ publicacion: publicacionId }).populate('usuario').populate('subComentarios');
+        const comentarios = await Comentario.find({ publicacion: publicacionId, subComentario: null })
+            .populate('usuario')
+            .sort({ fechaCreacion: -1 });
 
-        // return de la respuesta
-        res.status(200).send({
+        const comentarioRespuesta = comentarios.map(comentario => {
+            return {
+                comentarioId: comentario._id,
+                texto: comentario.texto,
+                fechaCreacion: moment.momentFromNow(comentario.fechaCreacion),
+                usuario: {
+                    nombreUsuario: comentario.usuario.nombreUsuario,
+                    fotoURL: comentario.usuario.fotoURL
+                }
+            }
+        });
+
+        return res.status(200).send({
             respuesta: 'OK',
-            mensaje: 'Comentarios obtenidos correctamente',
-            datos: comentarios
+            datos: comentarioRespuesta
+        });
+    } catch (err) {
+        return res.status(500).send({
+            respuesta: 'EXCEPTION',
+            mensaje: err.message
+        });
+    }
+}
+
+const agregarComentario = async (req, res) => {
+    try {
+        const { userId } = req.token;
+        const { publicacionId } = req.params;
+        const { texto } = req.body;
+
+        const publicacion = await Publicacion.findById(publicacionId);
+
+        if (!publicacion) {
+            return res.status(404).send({
+                respuesta: 'ERROR',
+                mensaje: 'La publicación ' + publicacionId + ' fue encontrada'
+            });
+        }
+
+        const comentarioNuevo = new Comentario({
+            usuario: userId,
+            publicacion: publicacionId,
+            texto
+        });
+
+        await comentarioNuevo.save();
+
+        const comentarioPop = await Comentario.findById(comentarioNuevo._id)
+            .populate('usuario');
+
+        const comentarioRespuesta = {
+            comentarioId: comentarioPop._id,
+            texto: comentarioPop.texto,
+            fechaCreacion: moment.momentFromNow(comentarioPop.fechaCreacion),
+            usuario: {
+                nombreUsuario: comentarioPop.usuario.nombreUsuario,
+                fotoURL: comentarioPop.usuario.fotoURL
+            }
+        }
+        return res.status(200).send({
+            respuesta: 'OK',
+            mensaje: 'Comentario agregado correctamente',
+            datos: comentarioRespuesta
         });
     } catch (err) {
         return res.status(500).send({
@@ -33,45 +93,25 @@ const obtenerComentarios = async (req, res) => {
 
 const obtenerSubcomentarios = async (req, res) => {
     try {
-        const comentario = await Comentario.findById(req.params.comentarioId);
+        const { comentarioId } = req.params;
+        const comentarios = await Comentario.find({ subComentario: comentarioId })
+            .populate('usuario');
 
-        if (!comentario) return res.status(404).json({ message: 'Comentario no encontrado' });
-
-        res.json(comentario);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-}
-
-const agregarComentario = async (req, res) => {
-    try {
-        // obtiene los datos del usuario y la publicacion
-        const { userId } = req.token;
-        const { publicacionId } = req.params;
-        const { texto } = req.body;
-
-        // busca la publicacion en la base de datos
-        const publicacion = await Publicacion.findById(publicacionId);
-
-        if (!publicacion) return res.status(404).send({
-            respuesta: 'ERROR',
-            mensaje: 'La publicación ' + publicacionId + ' fue encontrada'
+        const comentarioRespuesta = comentarios.map(comentario => {
+            return {
+                comentarioId: comentario._id,
+                texto: comentario.texto,
+                fechaCreacion: moment.momentFromNow(comentario.fechaCreacion),
+                usuario: {
+                    nombreUsuario: comentario.usuario.nombreUsuario,
+                    fotoURL: comentario.usuario.fotoURL
+                }
+            }
         });
 
-        // crea un nuevo comentario con los datos del usuario y la publicacion
-        const nuevoComentario = new Comentario({
-            usuario: userId,
-            publicacion: publicacionId,
-            texto
-        });
-
-        // guarda el nuevo comentario en la base de datos
-        await nuevoComentario.save();
-        // return de la respuesta
-        res.status(200).send({
+        return res.status(200).send({
             respuesta: 'OK',
-            mensaje: 'Comentario agregado correctamente',
-            datos: nuevoComentario
+            datos: comentarioRespuesta
         });
     } catch (err) {
         return res.status(500).send({
@@ -81,22 +121,46 @@ const agregarComentario = async (req, res) => {
     }
 }
 
+
 const agregarSubComentario = async (req, res) => {
     try {
         const { userId } = req.token;
-        const comentario = await Comentario.findById(req.params.comentarioId);
-        if (!comentario) return res.status(404).json({ message: 'Comentario no encontrado' });
-
+        const { comentarioId } = req.params;
+        const comentario = await Comentario.findById(comentarioId);
+        if (!comentario) {
+            return res.status(404).json({ message: 'Comentario no encontrado' });
+        }
         const subComentario = new Comentario({
             usuario: userId,
+            publicacion: comentario.publicacion,
+            subComentario: comentarioId,
             texto: req.body.texto
         });
 
-        comentario.subComentarios.push(subComentario);
-        await comentario.save();
-        res.status(201).json(comentario);
+        await subComentario.save();
+
+        const comentarioPop = await Comentario.findById(subComentario._id)
+            .populate('usuario');
+
+        const comentarioRespuesta = {
+            comentarioId: comentarioPop._id,
+            texto: comentarioPop.texto,
+            fechaCreacion: moment.momentFromNow(comentarioPop.fechaCreacion),
+            usuario: {
+                nombreUsuario: comentarioPop.usuario.nombreUsuario,
+                fotoURL: comentarioPop.usuario.fotoURL
+            }
+        }
+        return res.status(201).send({
+            respuesta: 'OK',
+            datos: comentarioRespuesta
+        });
+
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        return res.status(500).send({
+            respuesta: 'EXCEPTION',
+            mensaje: err.message
+        });
     }
 }
 

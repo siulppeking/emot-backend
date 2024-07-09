@@ -15,8 +15,8 @@ const ComentarioSchema = new Schema({
         type: String,
         default: null
     },
-    subComentarios: {
-        type: Array,
+    subComentario: {
+        type: Schema.Types.ObjectId,
         ref: 'comentarios',
         default: null
     },
