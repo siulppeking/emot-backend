@@ -1,6 +1,6 @@
 const Publicacion = require("../models/publicacion");
-const moment = require('../helpers/moment.helper');
 const Reaccion = require("../models/reaccion");
+const moment = require('../helpers/moment.helper');
 
 const obtenerPublicaciones = async (req, res) => {
     try {
@@ -12,9 +12,6 @@ const obtenerPublicaciones = async (req, res) => {
                 publicacionId: publicacion._id,
                 titulo: publicacion.titulo,
                 descripcion: publicacion.descripcion,
-                fechaCreacion: moment.momentFormat(publicacion.fechaCreacion, 'DD/MM/YYYY HH:mm:ss'),
-                fecCreFormato1: moment.momentFormat(publicacion.fechaCreacion, 'DD/MM/YYYY'),
-                fecCreFormato2: moment.momentFormat(publicacion.fechaCreacion, 'HH:mm:ss'),
                 fecCreFormato3: moment.momentFromNow(publicacion.fechaCreacion),
                 reacciones: publicacion.reacciones.length,
                 reaccionado: publicacion.reacciones.includes(userId),
@@ -55,9 +52,6 @@ const crearPublicacion = async (req, res) => {
         publicacionId: publicacionCreada._id,
         titulo: publicacionCreada.titulo,
         descripcion: publicacionCreada.descripcion,
-        fechaCreacion: moment.momentFormat(publicacionCreada.fechaCreacion, 'DD/MM/YYYY HH:mm:ss'),
-        fecCreFormato1: moment.momentFormat(publicacionCreada.fechaCreacion, 'DD/MM/YYYY'),
-        fecCreFormato2: moment.momentFormat(publicacionCreada.fechaCreacion, 'HH:mm:ss'),
         fecCreFormato3: moment.momentFromNow(publicacionCreada.fechaCreacion),
         usuario: {
             nombreUsuario: publicacionCreada.usuario.nombreUsuario,
@@ -95,9 +89,6 @@ const cambiarReaccion = async (req, res) => {
         publicacionId: publicacionNueva._id,
         titulo: publicacionNueva.titulo,
         descripcion: publicacionNueva.descripcion,
-        fechaCreacion: moment.momentFormat(publicacionNueva.fechaCreacion, 'DD/MM/YYYY HH:mm:ss'),
-        fecCreFormato1: moment.momentFormat(publicacionNueva.fechaCreacion, 'DD/MM/YYYY'),
-        fecCreFormato2: moment.momentFormat(publicacionNueva.fechaCreacion, 'HH:mm:ss'),
         fecCreFormato3: moment.momentFromNow(publicacionNueva.fechaCreacion),
         reacciones: publicacionNueva.reacciones.length,
         reaccionado: publicacionNueva.reacciones.includes(userId),

@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const connectDatabase = require('./database');
 const v1AuthRouter = require('./routers/auth.router');
 const v1PublicacionRouter = require('./routers/publicacion.router');
+const v1ComentarioRouter = require('./routers/comentario.router');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 // rutas de la aplicacion
 app.use('/api/v1/auth', v1AuthRouter);
 app.use('/api/v1/publicaciones', v1PublicacionRouter);
+app.use('/api/v1/comentarios', v1ComentarioRouter);
 
 // configuracion del puerto
 const PORT = process.env.PORT || 3000;

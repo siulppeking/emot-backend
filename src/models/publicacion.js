@@ -18,6 +18,10 @@ const PublicacionSchema = new Schema({
         type: Array,
         default: []
     },
+    comentarios: {
+        type: Array,
+        default: []
+    },
     fechaCreacion: {
         type: Date,
         default: Date.now
