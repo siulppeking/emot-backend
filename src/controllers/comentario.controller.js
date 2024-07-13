@@ -43,6 +43,38 @@ const obtenerComentarios = async (req, res) => {
     }
 }
 
+const obtenerComentariosTotal = async (req, res) => {
+    try {
+        // obtiene todos los comentarios de la publicacion
+        const comentarios = await Comentario.find({ subComentario: null })
+            .populate('usuario')
+            .sort({ fechaCreacion: -1 });
+
+        const comentarioRespuesta = comentarios.map(comentario => {
+            return {
+                publicacionId: comentario.publicacion,
+                comentarioId: comentario._id,
+                texto: comentario.texto,
+                fechaCreacion: moment.momentFromNow(comentario.fechaCreacion),
+                usuario: {
+                    nombreUsuario: comentario.usuario.nombreUsuario,
+                    fotoURL: comentario.usuario.fotoURL
+                }
+            }
+        });
+
+        return res.status(200).send({
+            respuesta: 'OK',
+            datos: comentarioRespuesta
+        });
+    } catch (err) {
+        return res.status(500).send({
+            respuesta: 'EXCEPTION',
+            mensaje: err.message
+        });
+    }
+}
+
 const agregarComentario = async (req, res) => {
     try {
         const { userId } = req.token;
@@ -70,13 +102,15 @@ const agregarComentario = async (req, res) => {
             .populate('usuario');
 
         const comentarioRespuesta = {
+            publicacionId: comentarioPop.publicacion,
             comentarioId: comentarioPop._id,
             texto: comentarioPop.texto,
             fechaCreacion: moment.momentFromNow(comentarioPop.fechaCreacion),
             usuario: {
                 nombreUsuario: comentarioPop.usuario.nombreUsuario,
                 fotoURL: comentarioPop.usuario.fotoURL
-            }
+            },
+            subComentarios: []
         }
         return res.status(200).send({
             respuesta: 'OK',
@@ -143,6 +177,8 @@ const agregarSubComentario = async (req, res) => {
             .populate('usuario');
 
         const comentarioRespuesta = {
+            subComentarioId: comentarioPop.subComentario,
+            publicacionId: comentarioPop.publicacion,
             comentarioId: comentarioPop._id,
             texto: comentarioPop.texto,
             fechaCreacion: moment.momentFromNow(comentarioPop.fechaCreacion),
@@ -166,6 +202,7 @@ const agregarSubComentario = async (req, res) => {
 
 module.exports = {
     obtenerComentarios,
+    obtenerComentariosTotal,
     obtenerSubcomentarios,
     agregarComentario,
     agregarSubComentario
