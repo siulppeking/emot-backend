@@ -14,6 +14,10 @@ const PublicacionSchema = new Schema({
         type: String,
         required: true
     },
+    categoria: {
+        type: String,
+        required: true
+    },
     reacciones: {
         type: Array,
         default: []

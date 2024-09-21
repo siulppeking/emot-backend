@@ -52,6 +52,7 @@ const obtenerPublicaciones = async (req, res) => {
                 publicacionId: publicacion._id,
                 titulo: publicacion.titulo,
                 descripcion: publicacion.descripcion,
+                categoria: publicacion.categoria,
                 fecCreFormato3: moment.momentFromNow(publicacion.fechaCreacion),
                 reacciones: publicacion.reacciones.length,
                 reaccionado: publicacion.reacciones.includes(userId),
@@ -79,12 +80,13 @@ const obtenerPublicaciones = async (req, res) => {
 
 const crearPublicacion = async (req, res) => {
     const { userId } = req.token;
-    const { titulo, descripcion } = req.body;
+    const { titulo, descripcion, categoria } = req.body;
 
     const publicacionData = {
         usuario: userId,
         titulo,
-        descripcion
+        descripcion,
+        categoria
     }
     const publicacionNueva = new Publicacion(publicacionData);
     await publicacionNueva.save();
@@ -93,6 +95,7 @@ const crearPublicacion = async (req, res) => {
         publicacionId: publicacionCreada._id,
         titulo: publicacionCreada.titulo,
         descripcion: publicacionCreada.descripcion,
+        categoria: publicacionCreada.categoria,
         fecCreFormato3: moment.momentFromNow(publicacionCreada.fechaCreacion),
         usuario: {
             nombreUsuario: publicacionCreada.usuario.nombreUsuario,
