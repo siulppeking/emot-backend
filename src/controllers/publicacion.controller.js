@@ -38,6 +38,7 @@ const obtenerPublicaciones = async (req, res) => {
                 texto: comentario.texto,
                 fechaCreacion: moment.momentFromNow(comentario.fechaCreacion),
                 usuario: {
+                    userId: comentario.usuario._id,
                     nombreUsuario: comentario.usuario.nombreUsuario,
                     fotoURL: comentario.usuario.fotoURL
                 },

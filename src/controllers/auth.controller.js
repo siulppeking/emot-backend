@@ -40,6 +40,7 @@ const login = async (req, res) => {
             respuesta: 'OK',
             mensaje: 'Validacion correcta',
             datos: {
+                userId: usuario._id,
                 nombreUsuario: usuario.nombreUsuario,
                 correo,
                 fotoURL: usuario.fotoURL,
@@ -79,6 +80,7 @@ const loginGoogle = async (req, res) => {
                 respuesta: 'OK',
                 mensaje: 'Validacion correcta',
                 datos: {
+                    userId: usuario._id,
                     nombreUsuario,
                     correo,
                     fotoURL,
@@ -107,6 +109,7 @@ const loginGoogle = async (req, res) => {
             respuesta: 'OK',
             mensaje: 'Validacion correcta',
             datos: {
+                userId: usuario._id,
                 nombreUsuario: userNew.nombreUsuario,
                 correo,
                 fotoURL: userNew.fotoURL,
@@ -155,6 +158,7 @@ const registro = async (req, res) => {
             respuesta: 'OK',
             mensaje: 'Usuario creado correctamente',
             datos: {
+                userId: usuario._id,
                 nombreUsuario: userNew.nombreUsuario,
                 correo,
                 fotoURL: userNew.fotoURL,

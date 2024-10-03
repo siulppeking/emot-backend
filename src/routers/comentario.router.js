@@ -9,5 +9,6 @@ v1ComentarioRouter.get('/', jwt.validarJWT, comentarioController.obtenerComentar
 v1ComentarioRouter.post('/:publicacionId', jwt.validarJWT, comentarioController.agregarComentario);
 v1ComentarioRouter.get('/:comentarioId/subcomentarios', jwt.validarJWT, comentarioController.obtenerSubcomentarios);
 v1ComentarioRouter.post('/:comentarioId/subcomentarios', jwt.validarJWT, comentarioController.agregarSubComentario);
+v1ComentarioRouter.delete('/:comentarioId', jwt.validarJWT, comentarioController.eliminarComentario);
 
 module.exports = v1ComentarioRouter;

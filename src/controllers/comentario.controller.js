@@ -107,6 +107,7 @@ const agregarComentario = async (req, res) => {
             texto: comentarioPop.texto,
             fechaCreacion: moment.momentFromNow(comentarioPop.fechaCreacion),
             usuario: {
+                userId: comentarioPop.usuario._id,
                 nombreUsuario: comentarioPop.usuario.nombreUsuario,
                 fotoURL: comentarioPop.usuario.fotoURL
             },
@@ -123,6 +124,31 @@ const agregarComentario = async (req, res) => {
             mensaje: err.message
         });
     }
+}
+
+const eliminarComentario = async (req, res) => {
+    try {
+        const { comentarioId } = req.params;
+        const comentario = await Comentario.findByIdAndDelete({ _id: comentarioId });
+
+        if (!comentario) {
+            return res.status(404).send({
+                respuesta: 'ERROR',
+                mensaje: 'La comentario ' + comentarioId + ' fue encontrado'
+            });
+        }
+        return res.status(200).send({
+            respuesta: 'OK',
+            mensaje: 'Comentario eliminado correctamente'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            respuesta: 'EXCEPTION',
+            mensaje: error.message
+        });
+    }
+
 }
 
 const obtenerSubcomentarios = async (req, res) => {
@@ -205,5 +231,6 @@ module.exports = {
     obtenerComentariosTotal,
     obtenerSubcomentarios,
     agregarComentario,
-    agregarSubComentario
+    agregarSubComentario,
+    eliminarComentario
 }
