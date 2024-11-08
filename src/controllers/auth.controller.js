@@ -36,6 +36,7 @@ const login = async (req, res) => {
             browser: userAgent
         });
         await usuarioAccesoNuevo.save();
+
         return res.status(200).send({
             respuesta: 'OK',
             mensaje: 'Validacion correcta',
@@ -50,9 +51,7 @@ const login = async (req, res) => {
     } catch (error) {
         return res.status(500).send({
             respuesta: 'EXCEPCION',
-            mensaje: error.message,
-            datos: {
-            }
+            mensaje: error.message
         });
     }
 }
